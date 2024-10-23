@@ -126,6 +126,7 @@ const SIMDVisualizer = () => {
     </button>
   );
 
+  
   return (
     <div className="min-h-screen bg-gray-900 p-4">
       <div className="w-full max-w-7xl mx-auto bg-gray-800 rounded-xl shadow-xl overflow-hidden">
