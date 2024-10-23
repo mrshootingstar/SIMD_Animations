@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import { Play, Pause, RotateCcw, ChevronDown } from 'lucide-react';
+import { Play, Pause, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 
 const SIMDVisualizer = () => {
@@ -126,7 +126,6 @@ const SIMDVisualizer = () => {
     </button>
   );
 
-  
   return (
     <div className="min-h-screen bg-gray-900 p-4">
       <div className="w-full max-w-7xl mx-auto bg-gray-800 rounded-xl shadow-xl overflow-hidden">
@@ -200,34 +199,23 @@ const SIMDVisualizer = () => {
             <div className="grid grid-cols-2 gap-4">
               {/* Left side - Visualization */}
               <div className="space-y-4 bg-gray-900 p-4 rounded-lg">
-                {/* Vector A */}
-                <div className="space-y-2">
-                  <div className="text-sm font-semibold text-gray-300">Vector A</div>
-                  <div className="flex gap-2">
-                    {vectorA.map((num, idx) => (
-                      <AnimatedNumber 
-                        key={`a-${idx}`}
-                        value={num}
-                        highlight={currentStep === idx}
-                        binary={['and', 'or', 'xor'].includes(operation)}
-                      />
-                    ))}
+                {/* Operation Title at the top */}
+                <div className="text-xl font-bold text-center text-blue-400 mb-6 bg-gray-800 py-2 rounded-lg">
+                  {operations[operation].name}
+                  <div className="text-sm font-mono text-blue-300 mt-1">
+                    {operations[operation].code}
                   </div>
                 </div>
 
-                {/* Operation Symbol */}
-                <div className="flex justify-center text-lg font-bold text-gray-300">
-                  {operations[operation].name}
-                </div>
-
-                {/* Vector B */}
-                {!['shuffle', 'shift_right', 'shift_left', 'permute'].includes(operation) && (
-                  <div className="space-y-2">
-                    <div className="text-sm font-semibold text-gray-300">Vector B</div>
+                {/* Vectors Container with minimal spacing */}
+                <div className="space-y-3">
+                  {/* Vector A */}
+                  <div>
+                    <div className="text-sm font-semibold text-gray-300 mb-1">Vector A</div>
                     <div className="flex gap-2">
-                      {vectorB.map((num, idx) => (
+                      {vectorA.map((num, idx) => (
                         <AnimatedNumber 
-                          key={`b-${idx}`}
+                          key={`a-${idx}`}
                           value={num}
                           highlight={currentStep === idx}
                           binary={['and', 'or', 'xor'].includes(operation)}
@@ -235,20 +223,37 @@ const SIMDVisualizer = () => {
                       ))}
                     </div>
                   </div>
-                )}
 
-                {/* Result */}
-                <div className="space-y-2">
-                  <div className="text-sm font-semibold text-gray-300">Result</div>
-                  <div className="flex gap-2">
-                    {getResult().map((num, idx) => (
-                      <AnimatedNumber 
-                        key={`result-${idx}`}
-                        value={num}
-                        highlight={currentStep === idx}
-                        binary={['and', 'or', 'xor'].includes(operation)}
-                      />
-                    ))}
+                  {/* Vector B */}
+                  {!['shuffle', 'shift_right', 'shift_left', 'permute'].includes(operation) && (
+                    <div>
+                      <div className="text-sm font-semibold text-gray-300 mb-1">Vector B</div>
+                      <div className="flex gap-2">
+                        {vectorB.map((num, idx) => (
+                          <AnimatedNumber 
+                            key={`b-${idx}`}
+                            value={num}
+                            highlight={currentStep === idx}
+                            binary={['and', 'or', 'xor'].includes(operation)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Result with separator */}
+                  <div className="pt-3 border-t border-gray-700">
+                    <div className="text-sm font-semibold text-gray-300 mb-1">Result</div>
+                    <div className="flex gap-2">
+                      {getResult().map((num, idx) => (
+                        <AnimatedNumber 
+                          key={`result-${idx}`}
+                          value={num}
+                          highlight={currentStep === idx}
+                          binary={['and', 'or', 'xor'].includes(operation)}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -301,11 +306,13 @@ __m256i a = _mm256_set_epi32(${vectorA.join(', ')});
 ${!['shuffle', 'shift_right', 'shift_left', 'permute'].includes(operation) 
   ? `__m256i b = _mm256_set_epi32(${vectorB.join(', ')});\n` 
   : ''}
-// Perform ${operations[operation].name} operation
-__m256i result = ${operations[operation].code}(${
+// Perform ${operations[operation].name} operation`}
+                    <span className="bg-blue-500/20 px-1 rounded">
+                      {`\n__m256i result = ${operations[operation].code}(${
   ['shuffle', 'shift_right', 'shift_left', 'permute'].includes(operation) 
     ? 'a, 0b00011011' 
     : 'a, b'});`}
+                    </span>
                   </pre>
                 </div>
 
